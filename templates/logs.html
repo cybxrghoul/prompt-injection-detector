@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detection Log Viewer</title>
+    <style>
+        body { background:#0a0e27; color:#eaf2fa; font-family: sans-serif; }
+        .container { max-width:1400px; margin:0 auto; padding:20px; }
+        .card { background:#141b3d; border-radius:10px; padding:24px; margin:32px 0;}
+        #logViewerTable { width:100%; background:#121628; color:#eaf2fa; border-radius:7px;}
+        th, td { padding:10px; border-bottom:1px solid #1a2347;}
+        th { background:#1a2347;}
+        input[type=text] { background:#191b32; color:#eee;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚩Flagged Detection Log Viewer</h1>
+        <div class="card" id="logViewerPanel">
+            <input type="text" id="logFilter" placeholder="Filter by prompt, pattern, or finding..." style="margin-bottom:8px; width:360px;">
+            <button id="exportCSVBtn" style="background:#00d9ff; color:#111b29; font-weight:700; 
+    padding:6px 22px; border-radius:6px; border:none; cursor:pointer; margin-bottom:12px;">Export as CSV</button>
+
+            <table id="logViewerTable">
+                <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Prompt</th>
+                    <th>Risk Score</th>
+                    <th>Blocked</th>
+                    <th>Patterns</th>
+                    <th>ML Risk</th>
+                    <th>ML Prediction</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+    function renderLogViewerTable(rows) {
+        let filter = document.getElementById("logFilter").value.trim().toLowerCase();
+        let tbody = document.getElementById('logViewerTable').querySelector("tbody");
+        let filtered = rows.filter(row =>
+            !filter ||
+            (row.prompt && row.prompt.toLowerCase().includes(filter)) ||
+            (row.patterns && row.patterns.toLowerCase().includes(filter)) ||
+            (row.topFinding && row.topFinding.toLowerCase().includes(filter))
+        );
+        if(filtered.length == 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No matching results.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = filtered.map(row =>
+            `<tr>
+                <td>${row.timestamp}</td>
+                <td style="word-break:break-word;max-width:390px">${row.prompt}</td>
+                <td>${row.overallRisk}</td>
+                <td>${row.blocked}</td>
+                <td>${row.patterns}</td>
+                <td>${row.mlRiskScore || 'N/A'}</td>
+                <td>${row.mlLabel === "1" ? "Malicious" : (row.mlLabel === "0" ? "Benign" : "N/A") }</td>
+            </tr>`
+        ).join('');
+    }
+    function exportMaliciousCSV() {
+    // Only export window._allLogData (already filtered to malicious!)
+    let rows = window._allLogData;
+    let header = ["timestamp","prompt","overallRisk","blocked","patterns","mlRiskScore","mlLabel"];
+    let csvContent = rows.reduce(
+        (csv, row) => csv + '\n' + [
+            row.timestamp,
+            `"${row.prompt}"`,
+            row.overallRisk,
+            row.blocked,
+            `"${row.patterns}"`,
+            row.mlRiskScore || "",
+            (row.mlLabel === "1" ? "Malicious" : (row.mlLabel === "0" ? "Benign" : "N/A"))
+        ].join(','),
+        header.join(',')
+    );
+    let blob = new Blob([csvContent], { type: "text/csv" });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = "malicious_logs.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+document.getElementById("exportCSVBtn").addEventListener("click", exportMaliciousCSV);
+
+
+    fetch("/api/detection_logs")
+    .then(r => r.json())
+    .then(data => {
+        // Filter for only malicious logs
+        window._allLogData = (data.logs || []).filter(row =>
+            row.blocked === "True" || row.blocked === true || row.blocked === 1
+        );
+        renderLogViewerTable(window._allLogData);
+    });
+
+document.getElementById("logFilter").addEventListener("input", () =>
+    renderLogViewerTable(window._allLogData)
+);
+
+    </script>
+</body>
+</html>

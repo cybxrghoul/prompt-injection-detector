@@ -1,0 +1,6 @@
+venv/
+aegis/
+__pycache__/
+*.pyc
+*.pkl
+.env

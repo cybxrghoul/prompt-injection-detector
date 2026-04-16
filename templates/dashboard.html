@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aegis Analytics Dashboard</title>
+    <style>
+        :root {
+            --color-background: #0a0e27;
+            --color-surface: #141b3d;
+            --color-surface-elevated: #1a2347;
+            --color-primary: #00d9ff;
+            --color-primary-hover: #00b8db;
+            --color-success: #00ff88;
+            --color-warning: #ffaa00;
+            --color-danger: #ff4466;
+            --color-text: #e8eaed;
+            --color-text-secondary: #9aa0b8;
+            --color-border: rgba(255, 255, 255, 0.1);
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #141b3d 0%, #1a2347 100%);
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--color-border);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, #00ff88 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            margin-top: 20px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            background: var(--color-surface-elevated);
+            color: var(--color-text);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin: 0 10px;
+            border: 1px solid var(--color-border);
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: var(--color-primary);
+            color: #0a0e27;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: var(--color-surface);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--color-border);
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--color-primary);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--color-text-secondary);
+            border: 2px dashed var(--color-border);
+            border-radius: 12px;
+        }
+
+        .placeholder h3 {
+            color: var(--color-primary);
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 968px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Aegis Analytics Dashboard</h1>
+            <p>Detection Logs, Trends & Machine Learning Analytics</p>
+            <div class="nav-links">
+                <a href="/">← Back to Detection System</a>
+                <a href="/logs" class="button">View Logs</a>
+                <a href="#trends">Trend Analysis</a>
+            </div>
+        </div>
+
+        
+
+            <div class="card">
+                <h2>📈 Analytics Overview</h2>
+                <div id="statsPanel" style="margin-top:22px;">
+  <div style="display:flex; gap:32px; flex-wrap:wrap;">
+    <div class="stat-card">
+      <div class="stat-label">Total Prompts Scanned</div>
+      <div class="stat-value" id="statTotal">...</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Malicious Prompts</div>
+      <div class="stat-value" id="statMalicious">...</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Detection Rate</div>
+      <div class="stat-value" id="statRate">...</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Top Threat Patterns</div>
+      <div class="stat-value" id="statTopPatterns">...</div>
+    </div>
+  </div>
+</div>
+
+<style>
+.stat-card { background:#141b3d; border-radius:8px; padding:18px; min-width:190px; box-shadow:0 2px 16px #18233833;margin-bottom:12px; }
+.stat-label { color:#9aa0b8; font-size:1.1em; margin-bottom:7px; }
+.stat-value { color:#00d9ff; font-size:1.9em; font-weight:700; }
+</style>
+
+            </div>
+
+           <div class="card full-width">
+  <h2>Monthly Prompt Injection Trends</h2>
+  <canvas id="trendChart" width="600" height="260" style="max-width:98%"></canvas>
+  <div id="trendStatus" class="placeholder"></div>
+</div>
+
+<div class="card full-width" style="display:flex; align-items:flex-start; justify-content:flex-start;">
+  <div style="flex:2;">
+    <h2>Distribution of Attack Patterns</h2>
+    <canvas id="patternPie" width="340" height="280"></canvas>
+  </div>
+  <div id="patternLegend" style="flex:1; margin-left:35px; min-width:210px; margin-top:40px;">
+    <script>
+        const PIE_COLORS = ['#00d9ff', '#ff4466', '#ffaa00', '#00ff88', '#1a2347', '#141b3d', '#9aa0b8', '#fa54bb', '#4cebe1'];
+let patternPieChart; // Will hold Chart.js instance
+
+function renderPatternPie(logs) {
+    const patterns = {};
+    logs.filter(row => row.blocked === "True" || row.blocked === true || row.blocked === 1)
+      .forEach(row => {
+        (row.patterns || "").split(',').forEach(pat => {
+          pat = pat.trim();
+          if (pat) patterns[pat] = (patterns[pat] || 0) + 1;
+        });
+      });
+    const labels = Object.keys(patterns);
+    const counts = labels.map(label => patterns[label]);
+    patternPieChart = new Chart(document.getElementById('patternPie').getContext('2d'), {
+      type: 'pie',
+      data: { labels: labels, datasets: [{ data: counts, backgroundColor: PIE_COLORS }] },
+      options: { plugins: { legend: { display: false } } }
+    });
+
+    // Interactive legend
+    let legendHTML = '<h3 style="color:#00d9ff;">Legend</h3>';
+    labels.forEach((label, i) => {
+      legendHTML += `<div class="legend-item"
+        data-idx="${i}"
+        style="display:flex;align-items:center;margin-bottom:10px;cursor:pointer;">
+        <span style="width:28px;height:20px;border-radius:5px;background:${PIE_COLORS[i%PIE_COLORS.length]};display:inline-block;margin-right:13px;"></span>
+        <span style="color:#eaf2fa;">${label}</span>
+      </div>`;
+    });
+    document.getElementById("patternLegend").innerHTML = legendHTML;
+
+    // Interactivity: highlight pie slice on legend hover
+    document.querySelectorAll('.legend-item').forEach(item => {
+      item.addEventListener('mouseenter', function () {
+        let idx = parseInt(this.dataset.idx);
+        let meta = patternPieChart.getDatasetMeta(0);
+        meta.data.forEach((arc, i) => {
+          arc.options.borderColor = (i === idx) ? '#fff' : PIE_COLORS[i%PIE_COLORS.length];
+          arc.options.borderWidth = (i === idx) ? 6 : 3;
+        });
+        patternPieChart.update();
+      });
+      item.addEventListener('mouseleave', function () {
+        let meta = patternPieChart.getDatasetMeta(0);
+        meta.data.forEach((arc, i) => {
+          arc.options.borderColor = PIE_COLORS[i%PIE_COLORS.length];
+          arc.options.borderWidth = 3;
+        });
+        patternPieChart.update();
+      });
+    });
+}
+
+fetch('/api/detection_logs').then(r=>r.json()).then(data=>renderPatternPie(data.logs||[]));
+
+    </script>
+  </div>
+</div>
+
+
+    
+            <div class="card full-width">
+  <h2>Malicious Activity Heatmap (Days & Hours)</h2>
+  <canvas id="heatmapChart" width="520" height="280" style="max-width:90%"></canvas>
+  <div id="heatStatus" class="placeholder"></div>
+</div>
+
+
+            <div class="card full-width">
+                <h2>🤖 Machine Learning Analytics</h2>
+                <div class="placeholder">
+                    <h3>Advanced Analytics</h3>
+                    <p>Pattern clustering, anomaly detection, and predictive analysis</p>
+                    <p><em>Coming soon: ML-powered threat intelligence</em></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     
+
+    
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+function aggregateMonthly(logs) {
+  // Aggregate attacks by ISO YYYY-MM
+  const map = new Map();
+  for(const row of logs){
+    let d = new Date(row.timestamp || row.time || row.date || Date.now());
+    let label = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    map.set(label, (map.get(label)||0)+1);
+  }
+  // Sort labels by time ascending
+  return Array.from(map.entries()).sort((a,b)=>a[0].localeCompare(b[0]));
+}
+document.addEventListener('DOMContentLoaded', function(){
+  fetch('/api/detection_logs')
+    .then(r=>r.json())
+    .then(data=>{
+      if(data.logs && data.logs.length>0){
+        const byMonth = aggregateMonthly(data.logs.filter(row =>
+          row.blocked === "True" || row.blocked === true || row.blocked === 1));
+        const labels = byMonth.map(e=>e[0]);
+        const counts = byMonth.map(e=>e[1]);
+        new Chart(document.getElementById('trendChart').getContext('2d'), {
+          type: 'bar',
+          data: {labels: labels,
+            datasets: [{label:'Detected Attacks per Month', data:counts, backgroundColor:'rgba(0,217,255,0.45)', borderColor:'#00d9ff', borderWidth:3}]
+          },
+          options: {plugins:{legend:{display:false}},
+            scales:{x:{grid:{color:'#273052'}},y:{beginAtZero:true,grid:{color:'#273052'}}}
+          }
+        });
+        document.getElementById('trendStatus').innerHTML = "";
+      } else {
+        document.getElementById('trendStatus').innerText = "No logs available yet!";
+      }
+    })
+    .catch(e=>{
+      document.getElementById('trendStatus').innerText = "Could not load backend log data.";
+    });
+});
+
+</script>
+
+   <script>
+let maliciousRows = [];
+
+function renderMaliciousTable(rows) {
+    let filter = document.getElementById("malFilter").value.trim().toLowerCase();
+    let tbody = document.getElementById('maliciousTable').querySelector("tbody");
+    let filtered = rows.filter(row => {
+        if (!filter) return true;
+        return (
+            (row.prompt && row.prompt.toLowerCase().includes(filter)) ||
+            (row.patterns && row.patterns.toLowerCase().includes(filter)) ||
+            (row.topFinding && row.topFinding.toLowerCase().includes(filter))
+        );
+    });
+    if(filtered.length == 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No matching results.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = filtered.map(row =>
+        `<tr>
+            <td>${row.timestamp}</td>
+            <td style="word-break:break-word;max-width:390px">${row.prompt}</td>
+            <td>${row.overallRisk}</td>
+            <td>${row.patterns}</td>
+            <td>${row.topFinding || ''}</td>
+        </tr>`
+    ).join('');
+}
+
+// CSV Export function
+function exportMaliciousCSV() {
+    let header = ["timestamp", "prompt", "overallRisk", "patterns", "topFinding"];
+    let rows = [];
+    let filter = document.getElementById("malFilter").value.trim().toLowerCase();
+    let filtered = maliciousRows.filter(row => {
+        if (!filter) return true;
+        return (
+            (row.prompt && row.prompt.toLowerCase().includes(filter)) ||
+            (row.patterns && row.patterns.toLowerCase().includes(filter)) ||
+            (row.topFinding && row.topFinding.toLowerCase().includes(filter))
+        );
+    });
+    rows.push(header.join(','));
+    filtered.forEach(row => {
+        rows.push([row.timestamp, `"${row.prompt}"`, row.overallRisk, `"${row.patterns}"`, `"${row.topFinding||''}"`].join(','));
+    });
+    let csvContent = rows.join('\r\n');
+    let blob = new Blob([csvContent], { type: "text/csv" });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = "malicious_prompts.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    fetch("/api/malicious_prompts")
+        .then(r=>r.json())
+        .then(data=>{
+            maliciousRows = data.malicious_prompts||[];
+            renderMaliciousTable(maliciousRows);
+        });
+    document.getElementById("malFilter").addEventListener("input", () => renderMaliciousTable(maliciousRows));
+    document.getElementById("malExportBtn").addEventListener("click", exportMaliciousCSV);
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+function getMonthKey(ts) {
+    // Accept ISO or Date, return "YYYY-MM"
+    let d = new Date(ts);
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+}
+
+function buildMonthlyTrend(rows) {
+    // Aggregate counts by month
+    let counts = {};
+    rows.forEach(row => {
+        let key = getMonthKey(row.timestamp);
+        counts[key] = (counts[key] || 0) + 1;
+    });
+    // Sort by time
+    let labels = Object.keys(counts).sort();
+    let data = labels.map(l => counts[l]);
+    return {labels, data};
+}
+
+// Store last highlight index
+let lastHighlight = null;
+
+document.querySelectorAll('.legend-item').forEach(item => {
+  item.addEventListener('mouseenter', function () {
+    let idx = parseInt(this.dataset.idx);
+    lastHighlight = idx;
+    let meta = patternPieChart.getDatasetMeta(0);
+    meta.data.forEach((arc, i) => {
+      // Highlight only hovered slice
+      arc.options.backgroundColor = (i === idx)
+        ? PIE_COLORS[i % PIE_COLORS.length]
+        : '#222c3d'; // Muted color for non-hover
+      arc.options.borderColor = (i === idx)
+        ? '#fff'
+        : PIE_COLORS[i % PIE_COLORS.length];
+      arc.options.borderWidth = (i === idx) ? 7 : 2;
+      arc.options.radius = (i === idx) ? arc.options.outerRadius + 12 : arc.options.outerRadius;
+    });
+    patternPieChart.update();
+  });
+  item.addEventListener('mouseleave', function () {
+    // Restore all slices to normal colors
+    let meta = patternPieChart.getDatasetMeta(0);
+    meta.data.forEach((arc, i) => {
+      arc.options.backgroundColor = PIE_COLORS[i % PIE_COLORS.length];
+      arc.options.borderColor = PIE_COLORS[i % PIE_COLORS.length];
+      arc.options.borderWidth = 3;
+      arc.options.radius = arc.options.outerRadius;
+    });
+    patternPieChart.update();
+  });
+});
+
+
+// --- Integrate with your previous maliciousRows ---
+document.addEventListener('DOMContentLoaded', function() {
+    // ...existing fetch code...
+    fetch("/api/malicious_prompts")
+        .then(r=>r.json())
+        .then(data=>{
+            maliciousRows = data.malicious_prompts||[];
+            renderMaliciousTable(maliciousRows);
+            renderMaliciousTrendChart(maliciousRows);
+        });
+    document.getElementById("malFilter").addEventListener("input", () => renderMaliciousTable(maliciousRows));
+    document.getElementById("malExportBtn").addEventListener("click", exportMaliciousCSV);
+});
+
+
+document.addEventListener('DOMContentLoaded',function(){
+  fetch('/api/detection_logs')
+    .then(r=>r.json())
+    .then(data=>{
+      if(data.logs && data.logs.length>0){
+        // Build a [day][hour] matrix
+        const matrix = Array.from({length:7},()=>Array(24).fill(0));
+        data.logs.filter(row=>row.blocked === "True" || row.blocked === true || row.blocked === 1)
+          .forEach(row=>{
+             let d=new Date(row.timestamp);
+             let day=d.getDay();
+             let hour=d.getHours();
+             matrix[day][hour]++;
+          });
+        const dayLabels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const datasets = [];
+        for(let h=0;h<24;h++) {
+          datasets.push({
+            label:`${h}:00`, 
+            data:matrix.map(row=>row[h]),
+            backgroundColor:`rgba(0,217,255,${0.25+0.015*h})`
+          });
+        }
+        new Chart(document.getElementById('heatmapChart').getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: dayLabels,
+            datasets: datasets
+          },
+          options: {
+            plugins:{legend:{display:false}},
+            scales:{
+              x:{stacked:true, grid:{color:'#273052'}},
+              y:{stacked:true, beginAtZero:true, grid:{color:'#273052'}}
+            }
+          }
+        });
+        document.getElementById('heatStatus').innerHTML = "";
+      } else {
+        document.getElementById('heatStatus').innerText = "No malicious log data available for heatmap.";
+      }
+    });
+});
+
+
+function fetchAndRenderStats() {
+  fetch('/api/detection_logs')
+    .then(r=>r.json())
+    .then(data=>{
+      const logs = data.logs || [];
+      document.getElementById("statTotal").innerText = logs.length;
+      const malicious = logs.filter(row => row.blocked === "True" || row.blocked === true);
+      document.getElementById("statMalicious").innerText = malicious.length;
+      document.getElementById("statRate").innerText = logs.length ?
+         (100 * malicious.length / logs.length).toFixed(2) + "%" : "0%";
+      // Top patterns
+      const patterns = {};
+      malicious.forEach(row=>{
+        (row.patterns||"").split(',').forEach(pat=>{
+          pat = pat.trim();
+          if(pat) patterns[pat] = (patterns[pat]||0)+1;
+        });
+      });
+      const topPatterns = Object.entries(patterns)
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,3)
+        .map(([pat,cnt])=>`${pat} (${cnt})`).join('\n');
+      document.getElementById("statTopPatterns").innerText = topPatterns || "None";
+    });
+}
+document.addEventListener('DOMContentLoaded', fetchAndRenderStats);
+
+</script>
+
+
+</body>
+</html>
