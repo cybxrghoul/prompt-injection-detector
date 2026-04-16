@@ -1,5 +1,9 @@
 # 🛡️ Aegis: Prompt Injection Detection Engine
 
+## 🎥 Demo
+
+![Aegis Demo](screenshots/demo.gif)
+
 ## Overview
 
 **Aegis** is a lightweight cybersecurity-focused detection system designed to identify **prompt injection attacks** in LLM-based applications.
