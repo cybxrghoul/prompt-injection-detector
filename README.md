@@ -20,7 +20,7 @@ Prompt injection is one of the most critical emerging threats in AI systems. Att
 
 ---
 
-## ⚙️ Features
+## Features
 
 * Detection of malicious prompt patterns
 * Machine Learning-based classification (TF-IDF + trained model)
