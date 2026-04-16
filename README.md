@@ -132,7 +132,7 @@ Output:
 
 ## Author
 
-**Cybxrghoul**
+**Shri Shiva Guru R V**
 Cybersecurity Enthusiast | Detection Engineering | AI Security
 
 ---
