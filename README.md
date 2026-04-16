@@ -132,8 +132,7 @@ Output:
 
 ## Author
 
-**Shiva Guru**
-
+**Cybxrghoul**
 Cybersecurity Enthusiast | Detection Engineering | AI Security
 
 ---
