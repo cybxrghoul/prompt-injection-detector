@@ -1,6 +1,6 @@
 # 🛡️ Aegis: Prompt Injection Detection Engine
 
-## 📌 Overview
+## Overview
 
 **Aegis** is a lightweight cybersecurity-focused detection system designed to identify **prompt injection attacks** in LLM-based applications.
 
@@ -8,7 +8,7 @@ It combines **rule-based heuristics** with **machine learning analysis** to dete
 
 ---
 
-## 🚨 Why This Matters
+## Why This Matters
 
 Prompt injection is one of the most critical emerging threats in AI systems. Attackers can manipulate LLMs to:
 
@@ -22,15 +22,15 @@ Prompt injection is one of the most critical emerging threats in AI systems. Att
 
 ## ⚙️ Features
 
-* 🔍 Detection of malicious prompt patterns
-* 🧠 Machine Learning-based classification (TF-IDF + trained model)
-* 📊 Logging system for detected prompts
-* 🌐 Web interface with Flask dashboard
-* ⚡ Real-time prompt analysis
+* Detection of malicious prompt patterns
+* Machine Learning-based classification (TF-IDF + trained model)
+* Logging system for detected prompts
+* Web interface with Flask dashboard
+* Real-time prompt analysis
 
 ---
 
-## 🧠 How It Works
+## How It Works
 
 1. User input (prompt) is received
 2. Preprocessing and normalization
@@ -42,7 +42,7 @@ Prompt injection is one of the most critical emerging threats in AI systems. Att
 
 ---
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 Aegis-Detection/
@@ -74,7 +74,7 @@ Aegis-Detection/
 
 ---
 
-## 🚀 Installation & Setup
+## Installation & Setup
 
 ### 1. Clone the repository
 
@@ -104,7 +104,7 @@ python app.py
 
 ---
 
-## 📊 Example Use Case
+## Example Use Case
 
 Input:
 
@@ -120,7 +120,7 @@ Output:
 
 ---
 
-## 🔮 Future Improvements
+## Future Improvements
 
 * Integration with LLM-based semantic detection
 * Larger and more diverse training dataset
@@ -130,13 +130,13 @@ Output:
 
 ---
 
-## 🧑‍💻 Author
+## Author
 
 **Shiva Guru**
 Cybersecurity Enthusiast | Detection Engineering | AI Security
 
 ---
 
-## 📜 License
+## License
 
 This project is for educational and research purposes.
