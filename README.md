@@ -47,14 +47,14 @@ Prompt injection is one of the most critical emerging threats in AI systems. Att
 ```
 Aegis-Detection/
 │
-├── app.py                  # Main Flask application
-├── check.py                # Detection logic integration
-├── requirements.txt        # Dependencies
+├── app.py                 
+├── check.py                
+├── requirements.txt        
 │
 ├── ml/
-│   ├── train_ml_model.py   # Model training script
-│   ├── classifier.pkl     # Trained ML model
-│   └── vectorizer.pkl     # TF-IDF vectorizer
+│   ├── train_ml_model.py   
+│   ├── classifier.pkl     
+│   └── vectorizer.pkl    
 │
 ├── static/
 │   ├── log_utils.js
