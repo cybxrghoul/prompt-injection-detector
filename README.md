@@ -1,6 +1,6 @@
 # 🛡️ Aegis: Prompt Injection Detection Engine
 
-## 🎥 Demo
+## Demo
 
 ![Aegis Demo](screenshots/demo.gif)
 
