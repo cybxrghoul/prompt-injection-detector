@@ -1,4 +1,4 @@
-# 🛡️ Aegis: Prompt Injection Detection Engine
+# 🛡️ Aegis: Prompt Injection Detection Engine 
 
 ## 🔹Detection Flow
 
@@ -133,7 +133,7 @@ Output:
 * Larger and more diverse training dataset
 * Real-time alerting system
 * API integration for external systems
-* Advanced anomaly detection techniques
+* Advanced anomaly detection techniques (and more to go... )
 
 ---
 
