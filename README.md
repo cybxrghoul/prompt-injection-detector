@@ -1,4 +1,5 @@
 # 🛡️ Aegis: Prompt Injection Detection Engine 
+> version 1.0
 
 ## 🔹Detection Flow
 
